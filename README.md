@@ -3,6 +3,12 @@
 Android utility that sends an image to a WhatsApp number **without saving it as a contact**.
 Built from `WhatsApp_Direct_Image_Sender_PRD_v1.0.docx`.
 
+## Download
+
+Signed APKs are published under
+[Releases](https://github.com/subu1979/EasyWhatsapp/releases) — grab
+`ImageSender-<version>-release.apk` from the latest tag.
+
 ## Build
 
 ```bash
@@ -43,7 +49,7 @@ published for this application id — Play refuses APKs signed with a different 
 |-----|-------|
 | FR-01 global country selector, default +91, search | `CountryRepository`, `CountryPickerSheet` |
 | FR-02 no contacts | `AndroidManifest.xml` declares zero dangerous permissions |
-| FR-03 image picker | `ActivityResultContracts.PickVisualMedia` in `MainScreen` |
+| FR-03 image picker | `ActivityResultContracts.PickVisualMedia` in `MainScreen`; camera capture via `ActivityResultContracts.TakePicture` into `ImageStore.createCaptureUri` (no `CAMERA` permission needed) |
 | FR-04 preview + replace | `ImageSection` in `MainScreen` |
 | FR-05 WhatsApp launch | `WhatsAppShareManager.shareImage` (ACTION_SEND, content URI, grant flag) |
 | FR-06 WhatsApp Business | `WhatsAppApp` enum + chooser dialog |
