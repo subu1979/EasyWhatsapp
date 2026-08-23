@@ -192,7 +192,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val result = when (action) {
             PendingAction.OPEN_CHAT -> WhatsAppShareManager.openChat(context, number.digits, app)
-            PendingAction.SHARE_IMAGE -> shareImageWithFallback(state.imageUri, app)
+            PendingAction.SHARE_IMAGE -> shareImageWithFallback(state.imageUri, app, number.digits)
         }
         reportShareResult(result)
     }
@@ -201,17 +201,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * Forwards the picked URI first; if the target cannot be granted access, retries once with an
      * app-owned copy exposed through FileProvider.
      */
-    private fun shareImageWithFallback(imageUri: Uri?, app: WhatsAppApp): ShareResult {
+    private fun shareImageWithFallback(
+        imageUri: Uri?,
+        app: WhatsAppApp,
+        recipientDigits: String
+    ): ShareResult {
         val uri = imageUri ?: return ShareResult.LaunchFailed
         val direct = if (ImageStore.canRead(context, uri)) {
-            WhatsAppShareManager.shareImage(context, uri, app)
+            WhatsAppShareManager.shareImage(context, uri, app, recipientDigits)
         } else {
             ShareResult.UriNotGrantable
         }
         if (direct != ShareResult.UriNotGrantable) return direct
 
         val copy = ImageStore.copyToCache(context, uri) ?: return ShareResult.LaunchFailed
-        return WhatsAppShareManager.shareImage(context, copy, app)
+        return WhatsAppShareManager.shareImage(context, copy, app, recipientDigits)
     }
 
     private fun reportShareResult(result: ShareResult) {

@@ -60,10 +60,14 @@ Release APK size: ~2.6 MB (target <10 MB).
 
 ## Known platform limits
 
-* **Recipient cannot be pre-selected together with an attachment** using public APIs.
-  `ACTION_SEND` attaches the image and WhatsApp asks for the recipient; `wa.me/<number>` opens a
-  chat with an unsaved number but carries no attachment. The undocumented `jid` extra is excluded
-  on purpose (PRD section 7).
+* **Nothing can send on WhatsApp's behalf.** WhatsApp exposes no on-device send API, so the last
+  press always happens inside WhatsApp. To keep that to a single tap, `ACTION_SEND` carries the
+  chat JID (`<digits>@s.whatsapp.net`) so WhatsApp opens on the right conversation with the photo
+  already attached. That extra is undocumented — PRD section 7 excluded it, and the product owner
+  overrode that on 2026-08-23 — so it is used as an optimisation only: if WhatsApp rejects the
+  intent, the same share is retried without the extra and WhatsApp asks for the recipient.
+  Truly in-app sending would require the WhatsApp Cloud API (business sender number, a backend,
+  paid conversations) or an Accessibility service that drives WhatsApp's UI (Play-policy banned).
 * **Whether a number is registered on WhatsApp cannot be checked** from the app. A local check
   needs `READ_CONTACTS` plus a saved contact (FR-02 forbids it); a server check needs the WhatsApp
   Cloud API and a backend (section 8 forbids it). WhatsApp shows its own error after the deep link.

@@ -13,9 +13,9 @@ val keystoreProperties = Properties().apply {
     if (keystorePropertiesFile.exists()) keystorePropertiesFile.inputStream().use { load(it) }
 }
 
-val appVersionName = "1.0"
+val appVersionName = "1.1"
 
-// Output APKs as ImageSender-1.0-release.apk / ImageSender-1.0-debug.apk.
+// Output APKs as ImageSender-<version>-release.apk / -debug.apk.
 base {
     archivesName.set("ImageSender-$appVersionName")
 }
@@ -28,7 +28,7 @@ android {
         applicationId = "com.subu1979.imagesender"
         minSdk = 31
         targetSdk = 36
-        versionCode = 1
+        versionCode = 2
         versionName = appVersionName
     }
 

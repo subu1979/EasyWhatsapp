@@ -12,7 +12,7 @@
     <string name="action_select_image">Select image</string>
     <string name="action_change_image">Change image</string>
     <string name="action_take_photo">Take photo</string>
-    <string name="action_open_whatsapp">Open WhatsApp</string>
+    <string name="action_open_whatsapp">Send to this number</string>
     <string name="action_open_chat_only">Open chat with this number (no image)</string>
     <string name="content_desc_selected_image">Selected image preview</string>
 
@@ -24,10 +24,10 @@
     <string name="ok">OK</string>
     <string name="dialog_title_notice">Notice</string>
     <string name="dialog_title_check_recipient">Check the recipient</string>
-    <string name="dialog_confirm_recipient">Sending to %1$s.\n\nThis app cannot check whether a number is registered on WhatsApp. If it is not, WhatsApp will report that the user is not registered and nothing will be sent.</string>
+    <string name="dialog_confirm_recipient">Sending to %1$s.\n\nWhatsApp opens on that chat with the photo attached and you press Send there. This app cannot check whether the number is registered on WhatsApp; if it is not, WhatsApp will say so and nothing is sent.</string>
     <string name="action_continue">Continue</string>
 
-    <string name="share_hint">WhatsApp asks you to confirm the recipient before sending. Open the chat first to place this number at the top of the list.</string>
+    <string name="share_hint">WhatsApp opens on this number\u2019s chat with the photo attached — press Send there. Android gives no way for an app to send on WhatsApp\u2019s behalf. If your WhatsApp version ignores the shortcut, it asks you to pick the recipient instead.</string>
 
     <!-- PRD section 12: exact user-facing error strings. -->
     <string name="error_invalid_number">Please enter a valid WhatsApp number.</string>

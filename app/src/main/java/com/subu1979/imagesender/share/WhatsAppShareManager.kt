@@ -26,20 +26,44 @@ object WhatsAppShareManager {
         false
     }
 
-    /** ACTION_SEND with an image MIME type, a content URI and temporary read permission. */
-    fun shareImage(context: Context, image: Uri, app: WhatsAppApp): ShareResult {
+    /**
+     * ACTION_SEND with an image MIME type, a content URI and temporary read permission.
+     *
+     * When [recipientDigits] is given, the chat JID is attached so WhatsApp opens straight into
+     * that conversation with the image already staged and only Send left to press. That extra is
+     * not part of any documented contract, so it is treated as an optimisation: if WhatsApp
+     * rejects the intent, the same share is retried without it and WhatsApp asks for the recipient
+     * as before.
+     */
+    fun shareImage(
+        context: Context,
+        image: Uri,
+        app: WhatsAppApp,
+        recipientDigits: String? = null
+    ): ShareResult {
         if (!isInstalled(context, app.packageName)) return ShareResult.NotInstalled
 
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = MIME_IMAGE
-            putExtra(Intent.EXTRA_STREAM, image)
-            // ClipData carries the grant to targets that read the URI from the clip instead.
-            clipData = ClipData.newUri(context.contentResolver, "image", image)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            setPackage(app.packageName)
+        if (recipientDigits != null) {
+            val direct = start(context, sendIntent(context, image, app, recipientDigits))
+            if (direct != ShareResult.LaunchFailed) return direct
         }
-        return start(context, intent)
+        return start(context, sendIntent(context, image, app, recipient = null))
+    }
+
+    private fun sendIntent(
+        context: Context,
+        image: Uri,
+        app: WhatsAppApp,
+        recipient: String?
+    ): Intent = Intent(Intent.ACTION_SEND).apply {
+        type = MIME_IMAGE
+        putExtra(Intent.EXTRA_STREAM, image)
+        // ClipData carries the grant to targets that read the URI from the clip instead.
+        clipData = ClipData.newUri(context.contentResolver, "image", image)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        setPackage(app.packageName)
+        if (recipient != null) putExtra(EXTRA_JID, "$recipient$JID_SUFFIX")
     }
 
     /**
@@ -66,4 +90,8 @@ object WhatsAppShareManager {
     }
 
     private const val MIME_IMAGE = "image/*"
+
+    /** WhatsApp's chat-target extra: "<country code><number>@s.whatsapp.net". */
+    private const val EXTRA_JID = "jid"
+    private const val JID_SUFFIX = "@s.whatsapp.net"
 }
