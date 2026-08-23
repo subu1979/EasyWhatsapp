@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WhatsApp Direct</string>
+
+    <string name="headline">Send an image without saving the number</string>
+    <string name="privacy_note">No contact will be created. The number and image stay on this device.</string>
+
+    <string name="label_country">Country</string>
+    <string name="label_mobile_number">Mobile number</string>
+    <string name="hint_mobile_number">9876543210</string>
+
+    <string name="action_select_image">Select image</string>
+    <string name="action_change_image">Change image</string>
+    <string name="action_take_photo">Take photo</string>
+    <string name="action_open_whatsapp">Open WhatsApp</string>
+    <string name="action_open_chat_only">Open chat with this number (no image)</string>
+    <string name="content_desc_selected_image">Selected image preview</string>
+
+    <string name="search_country">Search country, code or dialing code</string>
+    <string name="choose_country">Choose country</string>
+    <string name="choose_app">Send with</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="ok">OK</string>
+    <string name="dialog_title_notice">Notice</string>
+    <string name="dialog_title_check_recipient">Check the recipient</string>
+    <string name="dialog_confirm_recipient">Sending to %1$s.\n\nThis app cannot check whether a number is registered on WhatsApp. If it is not, WhatsApp will report that the user is not registered and nothing will be sent.</string>
+    <string name="action_continue">Continue</string>
+
+    <string name="share_hint">WhatsApp asks you to confirm the recipient before sending. Open the chat first to place this number at the top of the list.</string>
+
+    <!-- PRD section 12: exact user-facing error strings. -->
+    <string name="error_invalid_number">Please enter a valid WhatsApp number.</string>
+    <string name="error_no_image">Please select an image.</string>
+    <string name="error_whatsapp_missing">WhatsApp is not installed. Please install WhatsApp and try again.</string>
+    <string name="error_launch_failed">Unable to open WhatsApp. Please check that WhatsApp is installed and try again.</string>
+    <string name="error_no_camera">No camera app is available on this device.</string>
+    <string name="error_image_unreadable">Unable to read the selected image. Please choose a different image.</string>
+</resources>
