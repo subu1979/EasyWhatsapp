@@ -32,7 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.subu1979.imagesender.R
-import com.subu1979.imagesender.share.ContactPermission
 import com.subu1979.imagesender.share.ImageStore
 import com.subu1979.imagesender.share.WhatsAppApp
 
@@ -60,7 +58,6 @@ fun MainScreen(
     onCaptureStarted: (android.net.Uri) -> Unit,
     onCaptureResult: (Boolean) -> Unit,
     onCaptureUnavailable: () -> Unit,
-    onContactsPermissionResult: (Boolean) -> Unit,
     onOpenWhatsApp: () -> Unit,
     onOpenChat: () -> Unit,
     onConfirmRecipient: () -> Unit,
@@ -81,14 +78,6 @@ fun MainScreen(
         pickImage.launch(
             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
         )
-    }
-
-    val requestContacts = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { grants -> onContactsPermissionResult(grants.values.all { it }) }
-    )
-    LaunchedEffect(state.permissionRequestFor) {
-        if (state.permissionRequestFor != null) requestContacts.launch(ContactPermission.REQUIRED)
     }
 
     val takePicture = rememberLauncherForActivityResult(
@@ -143,20 +132,11 @@ fun MainScreen(
 
             Button(
                 onClick = onOpenWhatsApp,
-                enabled = !state.isPreparingRecipient,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 52.dp)
             ) {
-                Text(
-                    stringResource(
-                        if (state.isPreparingRecipient) {
-                            R.string.action_preparing_recipient
-                        } else {
-                            R.string.action_open_whatsapp
-                        }
-                    )
-                )
+                Text(stringResource(R.string.action_open_whatsapp))
             }
 
             TextButton(onClick = onOpenChat, modifier = Modifier.fillMaxWidth()) {

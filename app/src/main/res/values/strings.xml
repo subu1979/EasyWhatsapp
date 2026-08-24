@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">WhatsApp Direct</string>
 
-    <string name="headline">Send a photo to any number</string>
-    <string name="privacy_note">The number is added to your contacts for a few seconds so WhatsApp can offer it, then deleted automatically. Nothing leaves this device.</string>
+    <string name="headline">Send a photo without saving the number</string>
+    <string name="privacy_note">No contact is created. The number and the photo never leave this device.</string>
 
     <string name="label_country">Country</string>
     <string name="label_mobile_number">Mobile number</string>
@@ -13,7 +13,6 @@
     <string name="action_change_image">Change image</string>
     <string name="action_take_photo">Take photo</string>
     <string name="action_open_whatsapp">Send to this number</string>
-    <string name="action_preparing_recipient">Preparing recipient…</string>
     <string name="action_open_chat_only">Open chat with this number (no image)</string>
     <string name="content_desc_selected_image">Selected image preview</string>
 
@@ -29,7 +28,7 @@
     <string name="dialog_confirm_recipient">Sending to %1$s.\n\nThis app cannot check whether the number is registered on WhatsApp; if it is not, WhatsApp will say so and nothing is sent.</string>
     <string name="action_continue">Continue</string>
 
-    <string name="share_hint">The number is added to your contacts for a moment so WhatsApp will offer it, then WhatsApp opens with the photo attached and the number in its list. Turn on Auto-send to have those taps done for you. The contact is deleted as soon as you come back.</string>
+    <string name="share_hint">WhatsApp opens with the photo attached and you choose the chat there. WhatsApp offers no way for another app to pick the recipient for you, and nothing is written to your contacts.</string>
 
     <!-- PRD section 12: exact user-facing error strings. -->
     <string name="error_invalid_number">Please enter a valid WhatsApp number.</string>

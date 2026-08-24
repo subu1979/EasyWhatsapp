@@ -8,10 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.subu1979.imagesender.R
 import com.subu1979.imagesender.data.CountryRepository
 import com.subu1979.imagesender.domain.NumberValidator
-import com.subu1979.imagesender.share.ContactBridge
-import com.subu1979.imagesender.share.ContactPermission
 import com.subu1979.imagesender.share.ImageStore
-import kotlinx.coroutines.delay
 import com.subu1979.imagesender.share.ShareResult
 import com.subu1979.imagesender.share.WhatsAppApp
 import com.subu1979.imagesender.share.WhatsAppShareManager
@@ -31,11 +28,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /** The unregistered-recipient warning is shown once per session, not before every send. */
     private var warningAcknowledged = false
 
-    /** Raw contact id of the temporary recipient, alive only for the current send. */
-    private var pendingContactId: Long? = null
-
-    private var contactsPermissionAsked = false
-
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
@@ -43,8 +35,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         ImageStore.clearCache(context)
-        // A send interrupted by a crash or force stop can leave its temporary contact behind.
-        if (ContactPermission.isGranted(context)) ContactBridge.cleanUpLeftovers(context)
         viewModelScope.launch {
             // Building the list touches metadata, so keep it off the first frame.
             val countries = withContext(Dispatchers.Default) { CountryRepository.loadCountries() }
@@ -124,16 +114,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun onOpenChatClick() = startAction(PendingAction.OPEN_CHAT)
 
-    /**
-     * Continues either way: without Contacts access WhatsApp cannot offer the number, but the
-     * image share still works with the user picking the chat themselves.
-     */
-    fun onContactsPermissionResult(@Suppress("UNUSED_PARAMETER") granted: Boolean) {
-        val action = _uiState.value.permissionRequestFor ?: return
-        _uiState.update { it.copy(permissionRequestFor = null) }
-        startAction(action)
-    }
-
     fun onConfirmRecipient() {
         val action = _uiState.value.confirmationFor ?: return
         warningAcknowledged = true
@@ -168,17 +148,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         if (action == PendingAction.SHARE_IMAGE && !state.hasImage) {
             _uiState.update { it.copy(message = R.string.error_no_image) }
-            return
-        }
-
-        // The recipient has to exist in the address book for WhatsApp to offer it at all. Asked
-        // once per session: a refusal must not turn every send into another permission prompt.
-        if (action == PendingAction.SHARE_IMAGE &&
-            !contactsPermissionAsked &&
-            !ContactPermission.isGranted(context)
-        ) {
-            contactsPermissionAsked = true
-            _uiState.update { it.copy(permissionRequestFor = action) }
             return
         }
 
@@ -221,37 +190,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        if (action == PendingAction.OPEN_CHAT) {
-            reportShareResult(WhatsAppShareManager.openChat(context, number.digits, app))
-            return
+        val result = when (action) {
+            PendingAction.OPEN_CHAT -> WhatsAppShareManager.openChat(context, number.digits, app)
+            PendingAction.SHARE_IMAGE ->
+                shareImageWithFallback(state.imageUri, app, number.digits)
         }
-
-        viewModelScope.launch {
-            // WhatsApp only lists numbers it can see in the address book, so the recipient is put
-            // there for the length of this send and removed again in onSendFinished().
-            val bridged = bridgeContact(number.e164, formatForDisplay(number.e164))
-            if (bridged) {
-                _uiState.update { it.copy(isPreparingRecipient = true) }
-                delay(CONTACT_SYNC_DELAY_MS)
-                _uiState.update { it.copy(isPreparingRecipient = false) }
-            }
-            reportShareResult(shareImageWithFallback(state.imageUri, app, number.digits))
-        }
-    }
-
-    /** @return true when a temporary contact was created and WhatsApp needs a moment to see it. */
-    private fun bridgeContact(e164: String, displayName: String): Boolean {
-        if (!ContactPermission.isGranted(context)) return false
-        val rawContactId = ContactBridge.createTemporary(context, e164, displayName) ?: return false
-        pendingContactId = rawContactId
-        return true
-    }
-
-    /** Removes the throwaway contact once the user is back from WhatsApp. */
-    fun onSendFinished() {
-        val rawContactId = pendingContactId ?: return
-        pendingContactId = null
-        ContactBridge.delete(context, rawContactId)
+        reportShareResult(result)
     }
 
     /**
@@ -293,7 +237,5 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private companion object {
         const val MAX_NATIONAL_DIGITS = 15
 
-        /** Head start for WhatsApp to notice the new address-book entry before the share lands. */
-        const val CONTACT_SYNC_DELAY_MS = 1_500L
     }
 }

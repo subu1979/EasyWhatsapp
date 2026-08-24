@@ -20,10 +20,6 @@ data class MainUiState(
     val pendingCaptureUri: Uri? = null,
     val preview: Bitmap? = null,
     val isPreviewLoading: Boolean = false,
-    /** True while the temporary contact is being made visible to WhatsApp. */
-    val isPreparingRecipient: Boolean = false,
-    /** Set when the UI should ask for Contacts access before continuing this action. */
-    val permissionRequestFor: PendingAction? = null,
     val showCountryPicker: Boolean = false,
     val appChooserFor: PendingAction? = null,
     /** Set while the "recipient may not be on WhatsApp" warning is showing. */

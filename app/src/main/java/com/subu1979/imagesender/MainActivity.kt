@@ -30,7 +30,6 @@ class MainActivity : ComponentActivity() {
                     onCaptureStarted = viewModel::onCaptureStarted,
                     onCaptureResult = viewModel::onCaptureResult,
                     onCaptureUnavailable = viewModel::onCaptureUnavailable,
-                    onContactsPermissionResult = viewModel::onContactsPermissionResult,
                     onOpenWhatsApp = viewModel::onOpenWhatsAppClick,
                     onOpenChat = viewModel::onOpenChatClick,
                     onConfirmRecipient = viewModel::onConfirmRecipient,
@@ -47,7 +46,5 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         // WhatsApp may have been installed or removed while the app was in the background.
         viewModel.refreshInstalledApps()
-        // Back from WhatsApp: the temporary recipient contact has done its job.
-        viewModel.onSendFinished()
     }
 }

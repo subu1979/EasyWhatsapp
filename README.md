@@ -48,7 +48,7 @@ published for this application id — Play refuses APKs signed with a different 
 | Req | Where |
 |-----|-------|
 | FR-01 global country selector, default +91, search | `CountryRepository`, `CountryPickerSheet` |
-| FR-02 no contacts | **Overridden 2026-08-23.** WhatsApp only offers numbers present in the address book, so `ContactBridge` creates the recipient as a local contact for one send and deletes it on return; `cleanUpLeftovers` clears one left by a crash. Verified by `ContactBridgeTest`. |
+| FR-02 no contacts | `AndroidManifest.xml` declares zero dangerous permissions — verified in the release APK with `aapt2 dump permissions` |
 | FR-03 image picker | `ActivityResultContracts.PickVisualMedia` in `MainScreen`; camera capture via `ActivityResultContracts.TakePicture` into `ImageStore.createCaptureUri` (no `CAMERA` permission needed) |
 | FR-04 preview + replace | `ImageSection` in `MainScreen` |
 | FR-05 WhatsApp launch | `WhatsAppShareManager.shareImage` (ACTION_SEND, content URI, grant flag) |
@@ -68,8 +68,10 @@ WhatsApp, and the paired number can be banned).
 ## Known platform limits
 
 * **An unsaved number is invisible to WhatsApp.** Neither the `jid` extra nor opening the chat via
-  `wa.me` puts a new number into WhatsApp's share picker — verified on a Redmi device on
-  2026-08-23. The address book is the only route, hence the temporary contact.
+  `wa.me` puts a new number into WhatsApp's share picker — verified on a Redmi device on 2026-08-23.
+  Saving the number as a contact does surface it, but WhatsApp syncs the address book on its own
+  schedule, so a contact created seconds earlier is not yet visible; that approach was built in
+  v1.3 and removed in v1.5, because saving a contact is the one thing this app exists to avoid.
 * **Nothing can send on WhatsApp's behalf.** WhatsApp exposes no on-device send API, so the last
   press always happens inside WhatsApp. `ACTION_SEND` still carries the chat JID as a best-effort
   hint, but current WhatsApp builds ignore it. An Accessibility service that tapped through
