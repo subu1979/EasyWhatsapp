@@ -61,7 +61,7 @@ published for this application id — Play refuses APKs signed with a different 
 | Req | Where |
 |-----|-------|
 | FR-01 global country selector, default +91, search | `CountryRepository`, `CountryPickerSheet` |
-| FR-02 no contacts | `AndroidManifest.xml` declares zero dangerous permissions |
+| FR-02 no contacts | **Overridden 2026-08-23.** WhatsApp only offers numbers present in the address book, so `ContactBridge` creates the recipient as a local contact for one send and deletes it on return; `cleanUpLeftovers` clears one left by a crash. Verified by `ContactBridgeTest`. |
 | FR-03 image picker | `ActivityResultContracts.PickVisualMedia` in `MainScreen`; camera capture via `ActivityResultContracts.TakePicture` into `ImageStore.createCaptureUri` (no `CAMERA` permission needed) |
 | FR-04 preview + replace | `ImageSection` in `MainScreen` |
 | FR-05 WhatsApp launch | `WhatsAppShareManager.shareImage` (ACTION_SEND, content URI, grant flag) |
@@ -73,6 +73,9 @@ Release APK size: ~2.6 MB (target <10 MB).
 
 ## Known platform limits
 
+* **An unsaved number is invisible to WhatsApp.** Neither the `jid` extra nor opening the chat via
+  `wa.me` puts a new number into WhatsApp's share picker — verified on a Redmi device on
+  2026-08-23. The address book is the only route, hence the temporary contact.
 * **Nothing can send on WhatsApp's behalf.** WhatsApp exposes no on-device send API, so the last
   press always happens inside WhatsApp. To keep that to a single tap, `ACTION_SEND` carries the
   chat JID (`<digits>@s.whatsapp.net`) so WhatsApp opens on the right conversation with the photo

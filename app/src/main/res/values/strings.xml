@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">WhatsApp Direct</string>
 
-    <string name="headline">Send an image without saving the number</string>
-    <string name="privacy_note">No contact will be created. The number and image stay on this device.</string>
+    <string name="headline">Send a photo to any number</string>
+    <string name="privacy_note">The number is added to your contacts for a few seconds so WhatsApp can offer it, then deleted automatically. Nothing leaves this device.</string>
 
     <string name="label_country">Country</string>
     <string name="label_mobile_number">Mobile number</string>
@@ -13,6 +13,7 @@
     <string name="action_change_image">Change image</string>
     <string name="action_take_photo">Take photo</string>
     <string name="action_open_whatsapp">Send to this number</string>
+    <string name="action_preparing_recipient">Preparing recipient…</string>
     <string name="action_open_chat_only">Open chat with this number (no image)</string>
     <string name="content_desc_selected_image">Selected image preview</string>
 
@@ -37,8 +38,8 @@
     <string name="dialog_confirm_recipient">Sending to %1$s.\n\nThis app cannot check whether the number is registered on WhatsApp; if it is not, WhatsApp will say so and nothing is sent.</string>
     <string name="action_continue">Continue</string>
 
-    <string name="share_hint">WhatsApp opens with the photo attached. Depending on the WhatsApp version it either lands on this chat or asks you to tap the number in its list — the number appears there even when it is not a contact, so nothing is ever saved. Turn on Auto-send to skip those taps.</string>
-    <string name="share_hint_auto">Auto-send is on: WhatsApp opens, picks this number and presses Send by itself. If WhatsApp changes its layout, finish the send by hand — nothing is lost.</string>
+    <string name="share_hint">The number is added to your contacts for a moment so WhatsApp will offer it, then WhatsApp opens with the photo attached and the number in its list. Turn on Auto-send to have those taps done for you. The contact is deleted as soon as you come back.</string>
+    <string name="share_hint_auto">Auto-send is on: the number is added to contacts for a moment, WhatsApp opens, picks it and presses Send by itself, and the contact is deleted when you return. If WhatsApp changes its layout, finish the send by hand — nothing is lost.</string>
 
     <!-- PRD section 12: exact user-facing error strings. -->
     <string name="error_invalid_number">Please enter a valid WhatsApp number.</string>
