@@ -9,6 +9,19 @@ Signed APKs are published under
 [Releases](https://github.com/subu1979/EasyWhatsapp/releases) — grab
 `ImageSender-<version>-release.apk` from the latest tag.
 
+### Play Protect
+
+The app declares an Accessibility service (the optional auto-send helper), so Play Protect blocks
+the sideloaded install with "App blocked to protect your device". Two ways past it:
+
+```bash
+adb install -r ImageSender-<version>-release.apk   # adb installs are not gated
+```
+
+or on the phone: Settings → Google → All services → Play Protect → gear icon → turn off
+**Scan apps with Play Protect**, install, then turn it back on. Installed apps keep working.
+Some builds offer **More details → Install anyway** in the dialog itself.
+
 ## Build
 
 ```bash
