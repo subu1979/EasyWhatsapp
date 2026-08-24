@@ -17,15 +17,6 @@
     <string name="action_open_chat_only">Open chat with this number (no image)</string>
     <string name="content_desc_selected_image">Selected image preview</string>
 
-    <string name="auto_send_service_label">Image Sender auto-send</string>
-    <string name="auto_send_service_summary">Presses the recipient and Send inside WhatsApp for you</string>
-    <string name="auto_send_service_description">Lets Image Sender finish a send you started: once WhatsApp opens with your photo attached, it taps the number you entered and then Send. It reads WhatsApp screens only while a send is in progress, and never stores or transmits anything.</string>
-    <string name="auto_send_title">Auto-send</string>
-    <string name="auto_send_on">On — WhatsApp opens, picks the number and sends by itself.</string>
-    <string name="auto_send_off">Off — you tap the number and Send inside WhatsApp.</string>
-    <string name="auto_send_enable">Turn on</string>
-    <string name="auto_send_manage">Manage</string>
-    <string name="auto_send_unavailable">Could not open Accessibility settings on this device.</string>
 
     <string name="search_country">Search country, code or dialing code</string>
     <string name="choose_country">Choose country</string>
@@ -39,7 +30,6 @@
     <string name="action_continue">Continue</string>
 
     <string name="share_hint">The number is added to your contacts for a moment so WhatsApp will offer it, then WhatsApp opens with the photo attached and the number in its list. Turn on Auto-send to have those taps done for you. The contact is deleted as soon as you come back.</string>
-    <string name="share_hint_auto">Auto-send is on: the number is added to contacts for a moment, WhatsApp opens, picks it and presses Send by itself, and the contact is deleted when you return. If WhatsApp changes its layout, finish the send by hand — nothing is lost.</string>
 
     <!-- PRD section 12: exact user-facing error strings. -->
     <string name="error_invalid_number">Please enter a valid WhatsApp number.</string>

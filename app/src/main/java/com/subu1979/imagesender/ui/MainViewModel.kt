@@ -8,8 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.subu1979.imagesender.R
 import com.subu1979.imagesender.data.CountryRepository
 import com.subu1979.imagesender.domain.NumberValidator
-import com.subu1979.imagesender.share.AutoSendSession
-import com.subu1979.imagesender.share.AutoSendSettings
 import com.subu1979.imagesender.share.ContactBridge
 import com.subu1979.imagesender.share.ContactPermission
 import com.subu1979.imagesender.share.ImageStore
@@ -61,20 +59,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshInstalledApps()
     }
 
-    /** WhatsApp may be installed or removed, and auto-send toggled, while the app is backgrounded. */
+    /** WhatsApp may be installed or removed while the app sits in the background. */
     fun refreshInstalledApps() {
-        _uiState.update {
-            it.copy(
-                installedApps = WhatsAppShareManager.installedApps(context),
-                autoSendEnabled = AutoSendSettings.isEnabled(context)
-            )
-        }
-    }
-
-    fun onAutoSendSettingsClick() {
-        if (!AutoSendSettings.openSettings(context)) {
-            _uiState.update { it.copy(message = R.string.auto_send_unavailable) }
-        }
+        _uiState.update { it.copy(installedApps = WhatsAppShareManager.installedApps(context)) }
     }
 
     fun onNumberChange(input: String) {
@@ -184,8 +171,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        // Whether the recipient is registered on WhatsApp cannot be checked from a third-party
-        // app, so warn once per session instead of pretending to know.
         // The recipient has to exist in the address book for WhatsApp to offer it at all. Asked
         // once per session: a refusal must not turn every send into another permission prompt.
         if (action == PendingAction.SHARE_IMAGE &&
@@ -197,8 +182,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        // With auto-send on the user wants no interruptions at all, so the warning is skipped.
-        if (!warningAcknowledged && !AutoSendSettings.isEnabled(context)) {
+        // Whether the recipient is registered on WhatsApp cannot be checked from a third-party
+        // app, so warn once per session instead of pretending to know.
+        if (!warningAcknowledged) {
             _uiState.update {
                 it.copy(
                     confirmationFor = action,
@@ -278,13 +264,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         recipientDigits: String
     ): ShareResult {
         val uri = imageUri ?: return ShareResult.LaunchFailed
-        // Arm before launching: WhatsApp's first window can appear before startActivity returns.
-        if (AutoSendSettings.isEnabled(context)) {
-            AutoSendSession.arm(recipientDigits)
-        } else {
-            AutoSendSession.clear()
-        }
-
         val direct = if (ImageStore.canRead(context, uri)) {
             WhatsAppShareManager.shareImage(context, uri, app, recipientDigits)
         } else {
