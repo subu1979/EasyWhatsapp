@@ -58,6 +58,13 @@ published for this application id — Play refuses APKs signed with a different 
 
 Release APK size: ~2.6 MB (target <10 MB).
 
+## Sending without WhatsApp on screen
+
+One-tap silent sending needs a server holding a WhatsApp session — see
+[docs/openwa-deploy.md](docs/openwa-deploy.md) for a step-by-step deployment on an always-free VM,
+including the two risks that decide whether it is worth doing (cold first contact may be dropped by
+WhatsApp, and the paired number can be banned).
+
 ## Known platform limits
 
 * **An unsaved number is invisible to WhatsApp.** Neither the `jid` extra nor opening the chat via
