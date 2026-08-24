@@ -58,6 +58,7 @@ fun MainScreen(
     onCaptureStarted: (android.net.Uri) -> Unit,
     onCaptureResult: (Boolean) -> Unit,
     onCaptureUnavailable: () -> Unit,
+    onAutoSendSettingsClick: () -> Unit,
     onOpenWhatsApp: () -> Unit,
     onOpenChat: () -> Unit,
     onConfirmRecipient: () -> Unit,
@@ -143,8 +144,15 @@ fun MainScreen(
                 Text(stringResource(R.string.action_open_chat_only))
             }
 
+            AutoSendCard(
+                enabled = state.autoSendEnabled,
+                onManage = onAutoSendSettingsClick
+            )
+
             Text(
-                text = stringResource(R.string.share_hint),
+                text = stringResource(
+                    if (state.autoSendEnabled) R.string.share_hint_auto else R.string.share_hint
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -186,6 +194,41 @@ fun MainScreen(
             onChoose = onAppChosen,
             onDismiss = onAppChooserDismissed
         )
+    }
+}
+
+/** Status of the optional Accessibility helper, with a shortcut to the system switch. */
+@Composable
+private fun AutoSendCard(enabled: Boolean, onManage: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.auto_send_title),
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    text = stringResource(
+                        if (enabled) R.string.auto_send_on else R.string.auto_send_off
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            TextButton(onClick = onManage) {
+                Text(
+                    stringResource(
+                        if (enabled) R.string.auto_send_manage else R.string.auto_send_enable
+                    )
+                )
+            }
+        }
     }
 }
 

@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
                     onCaptureStarted = viewModel::onCaptureStarted,
                     onCaptureResult = viewModel::onCaptureResult,
                     onCaptureUnavailable = viewModel::onCaptureUnavailable,
+                    onAutoSendSettingsClick = viewModel::onAutoSendSettingsClick,
                     onOpenWhatsApp = viewModel::onOpenWhatsAppClick,
                     onOpenChat = viewModel::onOpenChatClick,
                     onConfirmRecipient = viewModel::onConfirmRecipient,

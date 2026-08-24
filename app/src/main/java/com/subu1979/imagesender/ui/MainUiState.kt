@@ -27,6 +27,8 @@ data class MainUiState(
     /** International number shown inside that warning, e.g. "+91 98765 43210". */
     val confirmationNumber: String = "",
     val installedApps: List<WhatsAppApp> = emptyList(),
+    /** Whether the Accessibility service that finishes the send inside WhatsApp is switched on. */
+    val autoSendEnabled: Boolean = false,
     @param:StringRes val message: Int? = null
 ) {
     val hasImage: Boolean get() = imageUri != null
