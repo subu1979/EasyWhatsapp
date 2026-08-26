@@ -5,6 +5,9 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.subu1979.imagesender.R
+import com.subu1979.imagesender.auto.AutoSendSession
+import com.subu1979.imagesender.auto.AutoSendSettings
+import com.subu1979.imagesender.auto.SendMode
 import com.subu1979.imagesender.data.CountryRepository
 import com.subu1979.imagesender.domain.NumberValidator
 import com.subu1979.imagesender.share.ShareResult
@@ -42,9 +45,38 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshInstalledApps()
     }
 
-    /** WhatsApp may be installed or removed while the app sits in the background. */
+    /** Re-read on every resume: apps, the system switch, and what the service has been doing. */
     fun refreshInstalledApps() {
-        _uiState.update { it.copy(installedApps = WhatsAppShareManager.installedApps(context)) }
+        _uiState.update {
+            it.copy(
+                installedApps = WhatsAppShareManager.installedApps(context),
+                mode = AutoSendSettings.mode(context),
+                serviceEnabled = AutoSendSettings.serviceEnabled(context),
+                autoLog = AutoSendSession.snapshot()
+            )
+        }
+    }
+
+    fun onModeChange(mode: SendMode) {
+        AutoSendSettings.setMode(context, mode)
+        _uiState.update { it.copy(mode = mode) }
+    }
+
+    fun onEnableServiceClick() {
+        if (!AutoSendSettings.openAccessibilitySettings(context)) {
+            _uiState.update { it.copy(message = R.string.error_settings_unavailable) }
+        }
+    }
+
+    fun onAppInfoClick() {
+        if (!AutoSendSettings.openAppInfo(context)) {
+            _uiState.update { it.copy(message = R.string.error_settings_unavailable) }
+        }
+    }
+
+    fun onClearLogClick() {
+        AutoSendSession.clearLog()
+        _uiState.update { it.copy(autoLog = emptyList()) }
     }
 
     fun onNumberChange(input: String) {
@@ -103,6 +135,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (number !is NumberValidator.Result.Valid) {
             _uiState.update { it.copy(showNumberError = true, message = R.string.error_invalid_number) }
             return
+        }
+
+        // Arm before launching: WhatsApp's window can appear before startActivity returns.
+        if (state.mode == SendMode.AUTO && AutoSendSettings.serviceEnabled(context)) {
+            AutoSendSession.arm(number.digits)
+        } else {
+            AutoSendSession.cancel("manual mode")
         }
 
         val result = WhatsAppShareManager.openChat(context, number.digits, app)

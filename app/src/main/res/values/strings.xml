@@ -17,6 +17,24 @@
     <string name="ok">OK</string>
     <string name="dialog_title_notice">Notice</string>
 
+    <string name="mode_title">Sending</string>
+    <string name="mode_manual">Manual</string>
+    <string name="mode_auto">Auto</string>
+    <string name="mode_manual_note">WhatsApp opens on the chat. You attach the photo and press Send.</string>
+    <string name="mode_auto_note">WhatsApp opens on the chat. Attach the photo and it is sent for you — no final tap.</string>
+    <string name="mode_auto_needs_service">Auto mode needs the accessibility service. Turn on “WhatsApp Direct auto-send”.</string>
+    <string name="mode_auto_restricted_hint">Greyed out? Open App info and choose “Allow restricted settings” first.</string>
+    <string name="action_enable_service">Accessibility settings</string>
+    <string name="action_app_info">App info</string>
+    <string name="auto_log_title">Auto-send activity</string>
+    <string name="action_clear_log">Clear</string>
+    <string name="auto_sent_toast">Sent</string>
+
+    <string name="auto_send_service_label">WhatsApp Direct auto-send</string>
+    <string name="auto_send_service_summary">Presses Send on the photo you attach, in the chat this app opened</string>
+    <string name="auto_send_service_description">Finishes a send you started here: when you tap Initiate WhatsApp in Auto mode, this service waits for the photo you attach in that chat and presses Send once, then stops. It reads WhatsApp screens only while a send is in progress, checks the chat is the number you typed, and never stores or transmits anything.</string>
+    <string name="error_settings_unavailable">Could not open that settings screen on this device.</string>
+
     <!-- PRD section 12: exact user-facing error strings. -->
     <string name="error_invalid_number">Please enter a valid WhatsApp number.</string>
     <string name="error_whatsapp_missing">WhatsApp is not installed. Please install WhatsApp and try again.</string>

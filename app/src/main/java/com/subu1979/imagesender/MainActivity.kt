@@ -27,6 +27,10 @@ class MainActivity : ComponentActivity() {
                     onCountryPickerVisibilityChange = viewModel::onCountryPickerVisibilityChange,
                     onCountrySelected = viewModel::onCountrySelected,
                     onInitiate = viewModel::onInitiateClick,
+                    onModeChange = viewModel::onModeChange,
+                    onEnableService = viewModel::onEnableServiceClick,
+                    onAppInfo = viewModel::onAppInfoClick,
+                    onClearLog = viewModel::onClearLogClick,
                     onAppChosen = viewModel::onAppChosen,
                     onAppChooserDismissed = viewModel::onAppChooserDismissed,
                     onMessageShown = viewModel::onMessageShown
