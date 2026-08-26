@@ -94,10 +94,10 @@ The applicationId and the signing key are what the registration is tied to, whic
 
 ## Status of this guide
 
-Steps 3 and 4 are verified on a CPH2637 (Android 16, WhatsApp 2.26.30.97) — both the gallery and
-camera paths send with no final tap.
+Verified end to end on a CPH2637 (ColorOS, Android 16, WhatsApp 2.26.30.97) on 2026-08-26:
 
-Steps 1 and 2 follow from how Android classifies installer-installed apps; Obtainium is not
-individually documented for the restricted-settings exemption, so confirm on the target phone that
-the accessibility toggle is available after installing through it. If it is not, use the fallback in
-step 3 or publish to Google Play, where neither obstacle exists.
+- Installed through Obtainium, the system records `installer=dev.imranr.obtainium` and the
+  restricted-settings appop drops from `ignore` to `default` — the accessibility toggle is available
+  with no "Allow restricted settings" detour, which a plain APK download on this phone refused
+  outright.
+- Auto mode sends without a final tap, from both the gallery attach and the camera capture.
