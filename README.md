@@ -1,17 +1,16 @@
 # WhatsApp Direct – Image Sender (MVP v1.0)
 
-Android utility for messaging a WhatsApp number **without saving it as a contact**.
+Android utility that opens a WhatsApp chat with any number **without saving it as a contact**.
 Built from `WhatsApp_Direct_Image_Sender_PRD_v1.0.docx`.
 
-**How it is used**
+Country code, number, one button. WhatsApp opens on that chat, and whatever you want to send —
+message, photo from the gallery, photo from the camera — is picked there with WhatsApp's own
+controls, which work on a chat with an unsaved number. The app holds no permissions and creates no
+contact.
 
-- **Number already in your contacts** — *Send to this number*: WhatsApp opens that chat with the
-  photo attached.
-- **Number not saved** — *Open chat with this number*: WhatsApp opens the chat with your message
-  ready to send, and you attach the photo there with WhatsApp's own paperclip. This is the only
-  route to an unsaved number; see [docs/feasibility.md](docs/feasibility.md) for why.
-
-No contact is created either way, and the app holds no permissions.
+The app used to attach the photo itself. That path only ever worked for numbers already in the
+address book, so it was removed in v3.0.0 in favour of the one route that works for any number —
+see [docs/feasibility.md](docs/feasibility.md).
 
 ## Download
 
@@ -45,13 +44,12 @@ published for this application id — Play refuses APKs signed with a different 
 | Path | Role |
 |------|------|
 | `MainActivity.kt` | Compose entry point |
-| `ui/MainScreen.kt` | One-screen UI, alerts, app chooser |
+| `ui/MainScreen.kt` | One-screen UI: country, number, Initiate |
 | `ui/CountryPickerSheet.kt` | Searchable country list |
 | `ui/MainViewModel.kt` | State, validation and share orchestration |
 | `data/CountryRepository.kt` | Country list from libphonenumber's supported regions |
 | `domain/NumberValidator.kt` | E.164 normalisation and validation |
-| `share/WhatsAppShareManager.kt` | ACTION_SEND / wa.me launch, target detection |
-| `share/ImageStore.kt` | Preview decoding, FileProvider fallback copy |
+| `share/WhatsAppShareManager.kt` | Click-to-chat launch, WhatsApp / Business detection |
 
 ## PRD traceability
 
@@ -59,9 +57,9 @@ published for this application id — Play refuses APKs signed with a different 
 |-----|-------|
 | FR-01 global country selector, default +91, search | `CountryRepository`, `CountryPickerSheet` |
 | FR-02 no contacts | `AndroidManifest.xml` declares zero dangerous permissions — verified in the release APK with `aapt2 dump permissions` |
-| FR-03 image picker | `ActivityResultContracts.PickVisualMedia` in `MainScreen`; camera capture via `ActivityResultContracts.TakePicture` into `ImageStore.createCaptureUri` (no `CAMERA` permission needed) |
-| FR-04 preview + replace | `ImageSection` in `MainScreen` |
-| FR-05 WhatsApp launch | `WhatsAppShareManager.shareImage` (ACTION_SEND, content URI, grant flag) |
+| FR-03 image picker | **Delegated to WhatsApp from v3.0.0.** An in-app picker could not attach to an unsaved recipient; WhatsApp's own gallery and camera can |
+| FR-04 preview + replace | Delegated to WhatsApp, which previews and replaces before sending |
+| FR-05 WhatsApp launch | `WhatsAppShareManager.openChat` (click-to-chat, the only route to an unsaved number) |
 | FR-06 WhatsApp Business | `WhatsAppApp` enum + chooser dialog |
 | FR-07 errors | `MainViewModel` → `MessageDialog`, strings in `values/strings.xml` |
 | FR-08 privacy | No INTERNET permission, no backend, no analytics |

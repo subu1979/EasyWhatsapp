@@ -26,18 +26,10 @@ class MainActivity : ComponentActivity() {
                     onNumberChange = viewModel::onNumberChange,
                     onCountryPickerVisibilityChange = viewModel::onCountryPickerVisibilityChange,
                     onCountrySelected = viewModel::onCountrySelected,
-                    onImagePicked = viewModel::onImagePicked,
-                    onCaptureStarted = viewModel::onCaptureStarted,
-                    onCaptureResult = viewModel::onCaptureResult,
-                    onCaptureUnavailable = viewModel::onCaptureUnavailable,
-                    onOpenWhatsApp = viewModel::onOpenWhatsAppClick,
-                    onOpenChat = viewModel::onOpenChatClick,
-                    onConfirmRecipient = viewModel::onConfirmRecipient,
-                    onConfirmationDismissed = viewModel::onConfirmationDismissed,
+                    onInitiate = viewModel::onInitiateClick,
                     onAppChosen = viewModel::onAppChosen,
                     onAppChooserDismissed = viewModel::onAppChooserDismissed,
-                    onMessageShown = viewModel::onMessageShown,
-                    onMessageTextChange = viewModel::onMessageChange
+                    onMessageShown = viewModel::onMessageShown
                 )
             }
         }

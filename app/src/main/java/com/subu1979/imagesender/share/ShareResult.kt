@@ -8,7 +8,4 @@ sealed interface ShareResult {
 
     /** The target is installed but refused or could not handle the intent. */
     data object LaunchFailed : ShareResult
-
-    /** The image URI could not be handed over; a retry with an app-owned copy is worthwhile. */
-    data object UriNotGrantable : ShareResult
 }
