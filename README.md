@@ -14,6 +14,10 @@ see [docs/feasibility.md](docs/feasibility.md).
 
 ## Download
 
+For someone other than the developer, follow [docs/install-guide.md](docs/install-guide.md): it
+installs through Obtainium, which avoids both the Play Protect block and the greyed-out accessibility
+toggle that a plain APK download runs into.
+
 Signed APKs are published under
 [Releases](https://github.com/subu1979/EasyWhatsapp/releases) — grab
 `ImageSender-<version>-release.apk` from the latest tag.
