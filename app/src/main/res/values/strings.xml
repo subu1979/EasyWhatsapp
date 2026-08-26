@@ -16,7 +16,6 @@
     <string name="action_open_chat_only">Open chat with this number (message only)</string>
     <string name="label_message">Message (optional)</string>
     <string name="hint_message">Typed into the chat, ready to send</string>
-    <string name="action_lab">Lab</string>
     <string name="content_desc_selected_image">Selected image preview</string>
 
 
@@ -31,7 +30,7 @@
     <string name="dialog_confirm_recipient">Sending to %1$s.\n\nThis app cannot check whether the number is registered on WhatsApp; if it is not, WhatsApp will say so and nothing is sent.</string>
     <string name="action_continue">Continue</string>
 
-    <string name="share_hint">WhatsApp opens with the photo attached and you choose the chat there. WhatsApp offers no way for another app to pick the recipient for you, and nothing is written to your contacts.</string>
+    <string name="share_hint">For a number already in your contacts, use Send to this number — WhatsApp opens that chat with the photo attached.\n\nFor a number you have not saved, use Open chat with this number: WhatsApp opens the chat with your message ready, and you attach the photo there with its paperclip button. Either way no contact is created.</string>
 
     <!-- PRD section 12: exact user-facing error strings. -->
     <string name="error_invalid_number">Please enter a valid WhatsApp number.</string>

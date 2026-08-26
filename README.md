@@ -1,7 +1,17 @@
 # WhatsApp Direct – Image Sender (MVP v1.0)
 
-Android utility that sends an image to a WhatsApp number **without saving it as a contact**.
+Android utility for messaging a WhatsApp number **without saving it as a contact**.
 Built from `WhatsApp_Direct_Image_Sender_PRD_v1.0.docx`.
+
+**How it is used**
+
+- **Number already in your contacts** — *Send to this number*: WhatsApp opens that chat with the
+  photo attached.
+- **Number not saved** — *Open chat with this number*: WhatsApp opens the chat with your message
+  ready to send, and you attach the photo there with WhatsApp's own paperclip. This is the only
+  route to an unsaved number; see [docs/feasibility.md](docs/feasibility.md) for why.
+
+No contact is created either way, and the app holds no permissions.
 
 ## Download
 
@@ -73,6 +83,10 @@ WhatsApp, and the paired number can be banned).
 
 ## Known platform limits
 
+* **Recipient targeting is gated by the address book.** For a saved number WhatsApp opens the chat
+  directly; for an unsaved one it falls back to its own picker, which does not list that number.
+  Confirmed on-device across every intent permutation, including `jid` combined with WhatsApp's
+  private `ContactPicker` component (v1.6.0 intent lab, removed in v2.0.0 once it had answered).
 * **An unsaved number is invisible to WhatsApp.** Neither the `jid` extra nor opening the chat via
   `wa.me` puts a new number into WhatsApp's share picker — verified on a Redmi device on 2026-08-23.
   Saving the number as a contact does surface it, but WhatsApp syncs the address book on its own

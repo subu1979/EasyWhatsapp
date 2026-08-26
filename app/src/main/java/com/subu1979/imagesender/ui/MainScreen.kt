@@ -65,8 +65,7 @@ fun MainScreen(
     onAppChosen: (WhatsAppApp) -> Unit,
     onAppChooserDismissed: () -> Unit,
     onMessageShown: () -> Unit,
-    onMessageTextChange: (String) -> Unit,
-    onOpenLab: () -> Unit
+    onMessageTextChange: (String) -> Unit
 ) {
     val messageText = state.message?.let { stringResource(it) }
 
@@ -100,14 +99,7 @@ fun MainScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
-                actions = {
-                    TextButton(onClick = onOpenLab) { Text(stringResource(R.string.action_lab)) }
-                }
-            )
-        }
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.app_name)) }) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
