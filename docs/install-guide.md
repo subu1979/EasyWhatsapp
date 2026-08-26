@@ -14,20 +14,6 @@ Installing through an **installer app** avoids both, because Android then does n
 sideloaded. That is what this guide does. Manual mode alone needs none of this — see the last
 section.
 
----
-
-## Before you send it to anyone
-
-Obtainium reads GitHub releases directly. The repository is currently **private**, so pick one:
-
-- **Make it public** — simplest for the user, nothing to configure. Note the repo also holds the PRD
-  document; remove it first if that should not be public.
-- **Keep it private** — the user must add a GitHub personal access token in Obtainium
-  (Settings → Source-specific → GitHub → Personal Access Token), with `repo` scope. Fine for one
-  trusted person, awkward beyond that.
-
----
-
 ## Step 1 — Install Obtainium (once)
 
 [Obtainium](https://github.com/ImranR98/Obtainium) is an open-source installer that keeps apps
