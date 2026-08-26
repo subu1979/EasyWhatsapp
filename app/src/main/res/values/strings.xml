@@ -13,7 +13,10 @@
     <string name="action_change_image">Change image</string>
     <string name="action_take_photo">Take photo</string>
     <string name="action_open_whatsapp">Send to this number</string>
-    <string name="action_open_chat_only">Open chat with this number (no image)</string>
+    <string name="action_open_chat_only">Open chat with this number (message only)</string>
+    <string name="label_message">Message (optional)</string>
+    <string name="hint_message">Typed into the chat, ready to send</string>
+    <string name="action_lab">Lab</string>
     <string name="content_desc_selected_image">Selected image preview</string>
 
 

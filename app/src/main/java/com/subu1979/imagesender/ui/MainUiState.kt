@@ -14,6 +14,10 @@ data class MainUiState(
     val selectedCountry: Country? = null,
     val nationalNumber: String = "",
     val numberIsValid: Boolean = false,
+    /** Normalised recipient without '+', empty until the number validates. */
+    val recipientDigits: String = "",
+    /** Optional text; click-to-chat can pre-fill it for an unsaved number. */
+    val messageText: String = "",
     val showNumberError: Boolean = false,
     val imageUri: Uri? = null,
     /** Destination handed to the camera app while a capture is in flight. */

@@ -64,7 +64,9 @@ fun MainScreen(
     onConfirmationDismissed: () -> Unit,
     onAppChosen: (WhatsAppApp) -> Unit,
     onAppChooserDismissed: () -> Unit,
-    onMessageShown: () -> Unit
+    onMessageShown: () -> Unit,
+    onMessageTextChange: (String) -> Unit,
+    onOpenLab: () -> Unit
 ) {
     val messageText = state.message?.let { stringResource(it) }
 
@@ -98,7 +100,14 @@ fun MainScreen(
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.app_name)) }) }
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.app_name)) },
+                actions = {
+                    TextButton(onClick = onOpenLab) { Text(stringResource(R.string.action_lab)) }
+                }
+            )
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -127,6 +136,15 @@ fun MainScreen(
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+
+            OutlinedTextField(
+                value = state.messageText,
+                onValueChange = onMessageTextChange,
+                label = { Text(stringResource(R.string.label_message)) },
+                placeholder = { Text(stringResource(R.string.hint_message)) },
+                minLines = 2,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             ImageSection(state = state, onPick = launchPicker, onCapture = launchCamera)
 

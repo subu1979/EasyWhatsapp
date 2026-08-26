@@ -70,10 +70,20 @@ object WhatsAppShareManager {
      * Opens the chat with an unsaved number using the public wa.me link, without attaching anything
      * and without creating a contact.
      */
-    fun openChat(context: Context, digits: String, app: WhatsAppApp): ShareResult {
+    fun openChat(
+        context: Context,
+        digits: String,
+        app: WhatsAppApp,
+        text: String = ""
+    ): ShareResult {
         if (!isInstalled(context, app.packageName)) return ShareResult.NotInstalled
 
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$digits")).apply {
+        val link = if (text.isBlank()) {
+            "https://wa.me/$digits"
+        } else {
+            "https://wa.me/$digits?text=${Uri.encode(text)}"
+        }
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link)).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             setPackage(app.packageName)
         }

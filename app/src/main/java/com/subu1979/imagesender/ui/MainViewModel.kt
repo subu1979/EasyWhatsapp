@@ -54,6 +54,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { it.copy(installedApps = WhatsAppShareManager.installedApps(context)) }
     }
 
+    fun onMessageChange(value: String) {
+        _uiState.update { it.copy(messageText = value) }
+    }
+
     fun onNumberChange(input: String) {
         val digits = input.filter { it.isDigit() }.take(MAX_NATIONAL_DIGITS)
         _uiState.update { it.copy(nationalNumber = digits, showNumberError = false) }
@@ -191,7 +195,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         val result = when (action) {
-            PendingAction.OPEN_CHAT -> WhatsAppShareManager.openChat(context, number.digits, app)
+            PendingAction.OPEN_CHAT ->
+                WhatsAppShareManager.openChat(context, number.digits, app, state.messageText)
             PendingAction.SHARE_IMAGE ->
                 shareImageWithFallback(state.imageUri, app, number.digits)
         }
@@ -230,8 +235,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun revalidate() {
         val state = _uiState.value
-        val valid = validator.validate(state.selectedCountry, state.nationalNumber) is NumberValidator.Result.Valid
-        _uiState.update { it.copy(numberIsValid = valid) }
+        val result = validator.validate(state.selectedCountry, state.nationalNumber)
+        val valid = result as? NumberValidator.Result.Valid
+        _uiState.update { it.copy(numberIsValid = valid != null, recipientDigits = valid?.digits.orEmpty()) }
     }
 
     private companion object {
