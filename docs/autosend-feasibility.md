@@ -90,20 +90,59 @@ the screen where they type the number, for that one send.
 
 ---
 
+## Research findings (2026-08-26)
+
+Checked against primary and secondary sources rather than assumed. Two of these correct earlier
+statements in this repository.
+
+**1. The approach is proven in production — and it is allowed on Google Play.**
+Several published apps automate WhatsApp sending through exactly this mechanism: *AutoResponder for
+WA*, *WhatsAuto*, *Auto Text — Schedule Messages*. They are listed on Google Play, which means an
+Accessibility service is acceptable when automating the user's own actions is the app's disclosed
+core function. **Correction:** earlier notes in this repo (v1.2/v1.4) say Play forbids this outright.
+That was too strong — Play restricts *undisclosed or unrelated* use, not this pattern. Distribution
+here stays sideload for other reasons, but the policy claim was wrong.
+
+**2. Android 13+ blocks Accessibility for sideloaded apps until the user lifts the restriction.**
+On Android 13, 14, 15 and 16, an app installed outside an app store has its accessibility toggle
+greyed out with *"For your security, this setting is currently unavailable"*. The user must open
+**App info → ⋮ → Allow restricted settings** first. This affects the Redmi 15 5G (Android 16); the
+Redmi Note 9 Pro (Android 12) is not affected. Installing over `adb` uses the session installer and
+generally avoids the restriction — a practical reason to prefer `adb install -r` for this build.
+
+**3. WhatsApp prohibits automating personal accounts with third-party apps.**
+Reported suspensions cluster around automated *bulk* sending; a single user-initiated send is far
+lower risk, but it is not zero. **Correction:** I previously said UI automation carries "no ban risk
+of that kind". More accurate: the ban risk is much lower than a protocol client such as OpenWA, and
+it is not nil.
+
+**4. Android 16's Advanced Protection Mode can revoke this permission.**
+When a user turns on Advanced Protection, Android disables the Accessibility API for apps not
+classified as accessibility tools, and revokes it if already granted. Anyone running that mode cannot
+use this feature at all. It is opt-in and off by default.
+
+**5. `FLAG_SECURE` is not an obstacle.** It blocks screenshots and screen recording, not the
+accessibility node tree, so a screen that refuses screenshots can still be read and clicked by a
+granted service.
+
+---
+
 ## Costs you would be accepting
 
-1. **Play Protect blocks the install.** Any APK declaring an Accessibility service is blocked on
-   sideload; we saw this in v1.2.0. Install goes through `adb install` or by turning Play Protect
-   scanning off for a minute. Google Play distribution is out — its policy restricts Accessibility to
-   accessibility purposes.
+1. **Install friction, twice over.** Play Protect blocks the sideloaded install of any APK declaring
+   an Accessibility service (seen in v1.2.0), and Android 13+ then greys out the toggle until
+   *App info → ⋮ → Allow restricted settings*. `adb install -r` sidesteps both in practice.
 2. **The service can read WhatsApp screens.** Scoped to the WhatsApp packages in the manifest, and it
    should keep nothing, but the capability is real and the user grants it explicitly.
 3. **WhatsApp UI changes can break it.** View ids are not a contract. Expect to re-target
    occasionally; the fallbacks reduce but do not remove this.
-4. **WhatsApp's terms discourage automation.** This is on-device automation of the user's own hands,
-   on their own phone, not a protocol client like OpenWA — no ban risk of that kind — but it is not
-   a supported integration either.
-5. **MIUI/HyperOS kills background services aggressively.** The Accessibility service needs to be
+4. **WhatsApp prohibits automating personal accounts with third-party apps.** This is on-device
+   automation of the user's own hands, not a protocol client like OpenWA, so the exposure is far
+   lower — reported suspensions concentrate on automated bulk sending. It is not zero, and one send
+   at a time is the safest way to use it.
+5. **Advanced Protection Mode disables it.** If the user ever enables Android 16's Advanced
+   Protection, the permission is revoked automatically and the feature stops working by design.
+6. **MIUI/HyperOS kills background services aggressively.** The Accessibility service needs to be
    exempted from battery optimisation or HyperOS will stop it, and the user must re-enable it after
    some system updates.
 
