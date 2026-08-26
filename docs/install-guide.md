@@ -85,6 +85,27 @@ comes up because nothing needs to be granted.
 
 ---
 
+## Shelf life: Android developer verification
+
+Google is closing the door this guide walks through, on a published timetable:
+
+- **30 September 2026** — enforcement begins in Brazil, Indonesia, Singapore and Thailand. On
+  certified devices in those countries, only apps registered by a **verified developer** install
+  normally.
+- **2027** — the same rule extends globally, India included.
+- Unregistered apps remain installable over **adb**, or through an "advanced flow" requiring
+  developer mode, a restart, a 24-hour wait and re-authentication. Not something to ask of a normal
+  user.
+
+This applies to the app regardless of how it is delivered — Obtainium does not exempt it.
+
+**What keeps this working:** register as a verified developer and register `com.subu1979.imagesender`
+through the Android Developer Console. That is separate from publishing on Google Play; the app can
+stay on GitHub releases and Obtainium. Registration has been open to all developers since March 2026.
+
+The applicationId and the signing key are what the registration is tied to, which is one more reason
+`keystore/release.jks` and its password must be backed up somewhere safe.
+
 ## Status of this guide
 
 Steps 3 and 4 are verified on a CPH2637 (Android 16, WhatsApp 2.26.30.97) — both the gallery and
