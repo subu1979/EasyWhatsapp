@@ -13,7 +13,7 @@ val keystoreProperties = Properties().apply {
     if (keystorePropertiesFile.exists()) keystorePropertiesFile.inputStream().use { load(it) }
 }
 
-val appVersionName = "4.1"
+val appVersionName = "4.0"
 
 // Output APKs as ImageSender-<version>-release.apk / -debug.apk.
 base {
