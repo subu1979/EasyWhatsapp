@@ -41,6 +41,16 @@ object AutoSendSession {
     private const val KEY_EXPIRES_AT = "expires_at"
     private const val KEY_LOG = "log"
     private const val KEY_VERIFIED_AT = "verified_at"
+    private const val KEY_ARMED_AT = "armed_at"
+
+    /**
+     * How long after the launch a WhatsApp conversation is taken to be the one this app opened.
+     *
+     * WhatsApp titles a chat with the contact's name, or an unsaved number's profile name, and only
+     * falls back to digits when it has neither. Requiring digits therefore worked for the user's own
+     * chat and for nobody else.
+     */
+    private const val LAUNCH_GRACE_MS = 60_000L
     private const val MAX_EVENTS = 40
     private const val LOG_SEPARATOR = "\n"
 
@@ -48,6 +58,7 @@ object AutoSendSession {
         context.prefs().edit {
             putString(KEY_TARGET, digits)
             putLong(KEY_EXPIRES_AT, SystemClock.elapsedRealtime() + WINDOW_MS)
+            putLong(KEY_ARMED_AT, SystemClock.elapsedRealtime())
             remove(KEY_VERIFIED_AT)
         }
         log(context, "ARMED for +$digits")
@@ -79,6 +90,12 @@ object AutoSendSession {
      */
     fun markChatVerified(context: Context) {
         context.prefs().edit { putLong(KEY_VERIFIED_AT, SystemClock.elapsedRealtime()) }
+    }
+
+    /** True while the chat WhatsApp just opened can still be attributed to this app's launch. */
+    fun withinLaunchGrace(context: Context): Boolean {
+        val armedAt = context.prefs().getLong(KEY_ARMED_AT, 0L)
+        return armedAt != 0L && SystemClock.elapsedRealtime() - armedAt < LAUNCH_GRACE_MS
     }
 
     /** True while a chat confirmation from this arming is still recent enough to act on. */
@@ -119,6 +136,7 @@ object AutoSendSession {
             remove(KEY_TARGET)
             remove(KEY_EXPIRES_AT)
             remove(KEY_VERIFIED_AT)
+            remove(KEY_ARMED_AT)
         }
     }
 

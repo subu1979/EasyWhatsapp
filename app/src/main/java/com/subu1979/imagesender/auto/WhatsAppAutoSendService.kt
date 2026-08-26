@@ -65,12 +65,21 @@ class WhatsAppAutoSendService : AccessibilityService() {
                 }
                 AutoSendSession.markChatVerified(this)
             }
-            Match.OTHER_CONVERSATION -> {
+            Match.CONVERSATION_UNNAMED -> {
+                // Named by the contact or their profile name, so the digits are not on screen. This
+                // is the chat the app opened, provided WhatsApp got here right after the launch.
+                if (!AutoSendSession.chatVerified(this) && AutoSendSession.withinLaunchGrace(this)) {
+                    trace("chat assumed from launch for +$target (no digits on screen)")
+                    AutoSendSession.log(this, "CHAT assumed from launch for +$target")
+                    AutoSendSession.markChatVerified(this)
+                }
+            }
+            Match.OTHER_NUMBER -> {
                 settleHandler.removeCallbacksAndMessages(null)
                 settlePending = false
                 if (AutoSendSession.chatVerified(this)) {
-                    trace("different chat on screen, verification dropped")
-                    AutoSendSession.log(this, "HOLDING — a different chat is open")
+                    trace("a different number is on screen, verification dropped")
+                    AutoSendSession.log(this, "HOLDING — a different number is on screen")
                 }
                 AutoSendSession.clearChatVerified(this)
             }
@@ -163,7 +172,7 @@ class WhatsAppAutoSendService : AccessibilityService() {
         }
     }
 
-    private enum class Match { ARMED_NUMBER, OTHER_CONVERSATION, UNKNOWN }
+    private enum class Match { ARMED_NUMBER, OTHER_NUMBER, CONVERSATION_UNNAMED, UNKNOWN }
 
     /**
      * Whether this screen names the armed number, names a different chat, or says nothing about the
@@ -179,9 +188,19 @@ class WhatsAppAutoSendService : AccessibilityService() {
         }
         if (matched != null) return Match.ARMED_NUMBER
 
+        // A different chat is only claimed on positive evidence: another number, written the way
+        // WhatsApp writes one. A name on the header proves nothing either way.
+        val otherNumber = findNode(root) { node ->
+            val text = node.text?.toString() ?: node.contentDescription?.toString() ?: return@findNode false
+            if (!text.trimStart().startsWith("+")) return@findNode false
+            val digits = text.filter { it.isDigit() }
+            digits.length >= MIN_PHONE_DIGITS && !digits.endsWith(tail)
+        }
+        if (otherNumber != null) return Match.OTHER_NUMBER
+
         val onConversation = root.className?.toString()?.contains("Conversation") == true ||
             findNode(root) { it.viewIdResourceName?.endsWith(":id/conversation_contact_name") == true } != null
-        return if (onConversation) Match.OTHER_CONVERSATION else Match.UNKNOWN
+        return if (onConversation) Match.CONVERSATION_UNNAMED else Match.UNKNOWN
     }
 
     private fun clickSelfOrAncestor(node: AccessibilityNodeInfo): Boolean {
@@ -236,6 +255,9 @@ class WhatsAppAutoSendService : AccessibilityService() {
 
         /** Below this a coincidental digit run could match the wrong chat. */
         const val MIN_MATCH_DIGITS = 8
+
+        /** A run this long, written after a '+', is a phone number rather than a date or a price. */
+        const val MIN_PHONE_DIGITS = 10
         const val MAX_ANCESTOR_DEPTH = 6
         const val TAG = "AutoSend"
     }

@@ -28,7 +28,7 @@ android {
         applicationId = "com.subu1979.imagesender"
         minSdk = 31
         targetSdk = 36
-        versionCode = 11
+        versionCode = 12
         versionName = appVersionName
     }
 
