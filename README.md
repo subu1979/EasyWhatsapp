@@ -58,6 +58,12 @@ published for this application id — Play refuses APKs signed with a different 
 
 Release APK size: ~2.6 MB (target <10 MB).
 
+## Feasibility research
+
+[docs/feasibility.md](docs/feasibility.md) is the decision record: every route tried on the target
+device, why each fails, the off-device alternatives with their real costs, and the constraint that
+has to be dropped for any of them to work.
+
 ## Sending without WhatsApp on screen
 
 One-tap silent sending needs a server holding a WhatsApp session — see
