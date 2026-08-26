@@ -6,6 +6,14 @@
       No Contacts, SMS, Phone, storage or INTERNET.
     -->
 
+    <!--
+      Keeps the process unfrozen while a send is armed. Without it, OEM builds freeze the app once
+      WhatsApp is in front and the accessibility service stops receiving events mid-flow.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <!-- Android 11+ package visibility: only what is needed to detect and launch WhatsApp. -->
     <queries>
         <package android:name="com.whatsapp" />
@@ -31,6 +39,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".auto.ArmingService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Keeps the accessibility service responsive for the two minutes a send is armed" />
+        </service>
 
         <!--
           Auto mode. Scoped to the WhatsApp packages, inert unless a send was armed in this app,

@@ -29,7 +29,7 @@ object AutoSendSettings {
 
     fun setMode(context: Context, mode: SendMode) {
         context.prefs().edit { putString(KEY_MODE, mode.name) }
-        if (mode == SendMode.MANUAL) AutoSendSession.cancel("switched to manual")
+        if (mode == SendMode.MANUAL) AutoSendSession.cancel(context, "switched to manual")
     }
 
     /** Whether the user has granted the service in system settings. */

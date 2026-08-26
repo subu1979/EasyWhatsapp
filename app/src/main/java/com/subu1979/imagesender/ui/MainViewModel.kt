@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.subu1979.imagesender.R
+import com.subu1979.imagesender.auto.ArmingService
 import com.subu1979.imagesender.auto.AutoSendSession
 import com.subu1979.imagesender.auto.AutoSendSettings
 import com.subu1979.imagesender.auto.SendMode
@@ -52,7 +53,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 installedApps = WhatsAppShareManager.installedApps(context),
                 mode = AutoSendSettings.mode(context),
                 serviceEnabled = AutoSendSettings.serviceEnabled(context),
-                autoLog = AutoSendSession.snapshot()
+                autoLog = AutoSendSession.snapshot(context)
             )
         }
     }
@@ -75,7 +76,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun onClearLogClick() {
-        AutoSendSession.clearLog()
+        AutoSendSession.clearLog(context)
         _uiState.update { it.copy(autoLog = emptyList()) }
     }
 
@@ -139,9 +140,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         // Arm before launching: WhatsApp's window can appear before startActivity returns.
         if (state.mode == SendMode.AUTO && AutoSendSettings.serviceEnabled(context)) {
-            AutoSendSession.arm(number.digits)
+            AutoSendSession.arm(context, number.digits)
+            ArmingService.start(context)
         } else {
-            AutoSendSession.cancel("manual mode")
+            AutoSendSession.cancel(context, "manual mode")
+            ArmingService.stop(context)
         }
 
         val result = WhatsAppShareManager.openChat(context, number.digits, app)

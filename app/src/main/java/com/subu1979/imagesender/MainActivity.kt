@@ -2,6 +2,7 @@ package com.subu1979.imagesender
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -18,6 +19,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        // Back closes the app outright rather than leaving it parked in recents: this is a
+        // one-shot launcher, and a stale copy in the background is just clutter.
+        onBackPressedDispatcher.addCallback(this) { finishAndRemoveTask() }
         setContent {
             WhatsAppDirectTheme {
                 val state by viewModel.uiState.collectAsStateWithLifecycle()

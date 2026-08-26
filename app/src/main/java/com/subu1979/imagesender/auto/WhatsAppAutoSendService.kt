@@ -1,7 +1,10 @@
 package com.subu1979.imagesender.auto
 
 import android.accessibilityservice.AccessibilityService
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
@@ -21,60 +24,121 @@ import com.subu1979.imagesender.share.WhatsAppApp
  */
 class WhatsAppAutoSendService : AccessibilityService() {
 
-    private var previewSeenAt = 0L
-    private var lastSignature = ""
+    private val settleHandler = Handler(Looper.getMainLooper())
+    private var settlePending = false
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        val target = AutoSendSession.activeTarget() ?: return
+        // Manual mode should leave nothing of ours running: an enabled accessibility service keeps
+        // the process alive for as long as it is switched on, so it switches itself off instead.
+        if (AutoSendSettings.mode(this) == SendMode.MANUAL) {
+            trace("manual mode — disabling self")
+            AutoSendSession.log(this, "SERVICE off (manual mode)")
+            disableSelf()
+            return
+        }
+
         val packageName = event?.packageName?.toString() ?: return
+        val target = AutoSendSession.activeTarget(this)
+        if (target == null) {
+            trace("no arming (event from $packageName)")
+            return
+        }
         if (packageName != WhatsAppApp.STANDARD.packageName &&
             packageName != WhatsAppApp.BUSINESS.packageName
         ) {
             return
         }
 
-        val root = rootInActiveWindow ?: return
-        val send = findSendControl(root, packageName)
-        if (send == null) {
-            previewSeenAt = 0L
+        val root = rootInActiveWindow
+        if (root == null) {
+            trace("armed +$target but rootInActiveWindow is null")
             return
         }
 
-        // The recipient is verified from the screen itself rather than trusted from the arming:
-        // if the user navigated to another chat, the digits will not match and nothing happens.
-        if (!chatMatches(root, target)) {
-            val signature = "no-match"
-            if (signature != lastSignature) {
-                lastSignature = signature
-                AutoSendSession.log("HOLDING — send control found, chat does not show +$target")
+        // Confirm the recipient whenever WhatsApp shows it, which is on the chat screen rather
+        // than on the composer that follows.
+        when (digitsMatch(root, target)) {
+            Match.ARMED_NUMBER -> {
+                if (!AutoSendSession.chatVerified(this)) {
+                    trace("chat verified for +$target")
+                    AutoSendSession.log(this, "CHAT verified for +$target")
+                }
+                AutoSendSession.markChatVerified(this)
             }
-            previewSeenAt = 0L
+            Match.OTHER_CONVERSATION -> {
+                settleHandler.removeCallbacksAndMessages(null)
+                settlePending = false
+                if (AutoSendSession.chatVerified(this)) {
+                    trace("different chat on screen, verification dropped")
+                    AutoSendSession.log(this, "HOLDING — a different chat is open")
+                }
+                AutoSendSession.clearChatVerified(this)
+            }
+            Match.UNKNOWN -> Unit
+        }
+
+        val send = findSendControl(root, packageName)
+        if (send == null) return
+
+        if (!AutoSendSession.chatVerified(this)) {
+            trace("send control present but chat never confirmed for +$target")
             return
         }
 
         // Let the preview settle so a photo still being cropped or captioned is not sent early.
-        val now = SystemClock.elapsedRealtime()
-        if (previewSeenAt == 0L) {
-            previewSeenAt = now
-            AutoSendSession.log("PREVIEW ready for +$target, settling")
+        //
+        // The wait is scheduled rather than driven by the next event: a composer opened from the
+        // camera is static and emits nothing further, so waiting for another event left the send
+        // hanging forever. Observed on a CPH2637 — the gallery composer kept emitting and worked,
+        // the camera one did not.
+        if (settlePending) return
+        settlePending = true
+        AutoSendSession.log(this, "PREVIEW ready for +$target, settling")
+        trace("preview ready for +$target, clicking in ${AutoSendSession.SETTLE_MS}ms")
+        settleHandler.postDelayed({ sendIfStillValid(target) }, AutoSendSession.SETTLE_MS)
+    }
+
+    /** Re-reads the screen after the settle delay: nothing is clicked on stale information. */
+    private fun sendIfStillValid(target: String) {
+        settlePending = false
+        if (AutoSendSession.activeTarget(this) != target) {
+            trace("arming changed during settle, not clicking")
             return
         }
-        if (now - previewSeenAt < AutoSendSession.SETTLE_MS) return
+        if (!AutoSendSession.chatVerified(this)) {
+            trace("verification lost during settle, not clicking")
+            return
+        }
 
+        val root = rootInActiveWindow ?: return
+        val packageName = root.packageName?.toString() ?: return
+        val send = findSendControl(root, packageName)
+        if (send == null) {
+            trace("send control gone after settle")
+            return
+        }
+
+        trace("clicking send for +$target")
         val clicked = clickSelfOrAncestor(send)
-        AutoSendSession.log(if (clicked) "SENT to +$target" else "CLICK REFUSED by WhatsApp")
+        AutoSendSession.log(this, if (clicked) "SENT to +$target" else "CLICK REFUSED by WhatsApp")
         if (clicked) {
-            AutoSendSession.consume()
-            previewSeenAt = 0L
+            AutoSendSession.consume(this)
+            ArmingService.stop(this)
             toast(getString(R.string.auto_sent_toast))
         }
     }
 
     override fun onInterrupt() = Unit
 
-    override fun onUnbind(intent: android.content.Intent?): Boolean {
-        AutoSendSession.cancel("service stopped")
-        return super.onUnbind(intent)
+    override fun onServiceConnected() {
+        super.onServiceConnected()
+        if (AutoSendSettings.mode(this) == SendMode.MANUAL) {
+            disableSelf()
+            return
+        }
+        // OEM builds unbind and re-bind this service freely; a rebind mid-flow must not look like a
+        // fresh start, so the arming is left alone and only its own expiry ends it.
+        AutoSendSession.log(this, "SERVICE connected")
     }
 
     /** Three widening attempts: exact id, described "Send", then a clickable node labelled send. */
@@ -99,15 +163,25 @@ class WhatsAppAutoSendService : AccessibilityService() {
         }
     }
 
-    /** True when the armed number appears in the visible text, which is how WhatsApp titles an
-     *  unsaved chat ("+91 97910 39009"). */
-    private fun chatMatches(root: AccessibilityNodeInfo, target: String): Boolean {
-        val found = findNode(root) { node ->
+    private enum class Match { ARMED_NUMBER, OTHER_CONVERSATION, UNKNOWN }
+
+    /**
+     * Whether this screen names the armed number, names a different chat, or says nothing about the
+     * recipient. Only a chat screen is treated as evidence of a different conversation: pickers and
+     * galleries are full of dates and file names that are not phone numbers.
+     */
+    private fun digitsMatch(root: AccessibilityNodeInfo, target: String): Match {
+        val tail = target.takeLast(MIN_MATCH_DIGITS)
+        val matched = findNode(root) { node ->
             val text = node.text?.toString() ?: node.contentDescription?.toString()
             val digits = text?.filter { it.isDigit() } ?: return@findNode false
-            digits.length >= MIN_MATCH_DIGITS && digits.endsWith(target.takeLast(MIN_MATCH_DIGITS))
+            digits.length >= MIN_MATCH_DIGITS && digits.endsWith(tail)
         }
-        return found != null
+        if (matched != null) return Match.ARMED_NUMBER
+
+        val onConversation = root.className?.toString()?.contains("Conversation") == true ||
+            findNode(root) { it.viewIdResourceName?.endsWith(":id/conversation_contact_name") == true } != null
+        return if (onConversation) Match.OTHER_CONVERSATION else Match.UNKNOWN
     }
 
     private fun clickSelfOrAncestor(node: AccessibilityNodeInfo): Boolean {
@@ -133,6 +207,24 @@ class WhatsAppAutoSendService : AccessibilityService() {
         return null
     }
 
+    /** Everything the service decides, in logcat, so a failure is diagnosable over adb. */
+    private fun trace(message: String) {
+        Log.i(TAG, message)
+    }
+
+    /** Digit runs currently on screen, to show why a match failed. */
+    private fun visibleDigits(root: AccessibilityNodeInfo): String {
+        val found = mutableListOf<String>()
+        fun walk(node: AccessibilityNodeInfo) {
+            val text = node.text?.toString() ?: node.contentDescription?.toString()
+            val digits = text?.filter { it.isDigit() }.orEmpty()
+            if (digits.length >= 6) found += digits
+            for (i in 0 until node.childCount) node.getChild(i)?.let(::walk)
+        }
+        walk(root)
+        return if (found.isEmpty()) "no digit runs" else found.joinToString(", ")
+    }
+
     private fun toast(text: String) {
         Toast.makeText(applicationContext, text, Toast.LENGTH_SHORT).show()
     }
@@ -145,5 +237,6 @@ class WhatsAppAutoSendService : AccessibilityService() {
         /** Below this a coincidental digit run could match the wrong chat. */
         const val MIN_MATCH_DIGITS = 8
         const val MAX_ANCESTOR_DEPTH = 6
+        const val TAG = "AutoSend"
     }
 }

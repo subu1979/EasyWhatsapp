@@ -29,6 +29,10 @@
     <string name="auto_log_title">Auto-send activity</string>
     <string name="action_clear_log">Clear</string>
     <string name="auto_sent_toast">Sent</string>
+    <string name="arming_channel_name">Auto-send armed</string>
+    <string name="arming_title">Auto-send armed for %1$s</string>
+    <string name="arming_text">Attach a photo in WhatsApp and it will be sent.</string>
+    <string name="arming_cancel">Cancel</string>
 
     <string name="auto_send_service_label">WhatsApp Direct auto-send</string>
     <string name="auto_send_service_summary">Presses Send on the photo you attach, in the chat this app opened</string>
