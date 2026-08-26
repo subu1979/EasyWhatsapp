@@ -68,6 +68,11 @@ Release APK size: ~2.6 MB (target <10 MB).
 
 ## Feasibility research
 
+[docs/autosend-feasibility.md](docs/autosend-feasibility.md) assesses the v4 idea: pressing Send
+inside WhatsApp automatically once the photo is attached. Feasible with an Accessibility service and
+no AI, gated on one on-device check that must happen before any code.
+
+
 [docs/feasibility.md](docs/feasibility.md) is the decision record: every route tried on the target
 device, why each fails, the off-device alternatives with their real costs, and the constraint that
 has to be dropped for any of them to work.
